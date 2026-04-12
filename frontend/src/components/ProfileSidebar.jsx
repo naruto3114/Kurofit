@@ -14,12 +14,12 @@ const ProfileSidebar = ({ userData, activeSection, setActiveSection }) => {
             {/* User Info */}
             <div className='flex items-center gap-4 p-6 border border-gray-100 bg-white rounded-3xl shadow-sm'>
                 <div className="relative">
-                    <img className='w-14 h-14 rounded-full object-cover border-2 border-gray-100' src={userData.image ? userData.image : defaultAvatar} alt="" />
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-4 border-white rounded-full"></div>
+                    <img className='w-14 h-14 rounded-full object-cover border-2 border-gray-100 shadow-inner' src={userData.image ? userData.image : defaultAvatar} alt="" />
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full"></div>
                 </div>
-                <div>
+                <div className="overflow-hidden">
                     <p className='text-[10px] text-gray-400 font-black uppercase tracking-widest'>Member</p>
-                    <p className='font-black text-lg text-black tracking-tight'>{userData.name.split(' ')[0]}</p>
+                    <p className='font-black text-lg text-black tracking-tight truncate'>{userData?.name ? userData.name.split(' ')[0] : 'User'}</p>
                 </div>
             </div>
 

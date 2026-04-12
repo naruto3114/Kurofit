@@ -19,10 +19,10 @@ const Hero = () => {
   return (
     <section className="relative min-h-[500px] sm:min-h-[calc(100vh-92px)] bg-white w-full overflow-hidden flex items-center">
       {/* Background Editorial Accent */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden sm:translate-y-20 translate-y-10">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden sm:translate-y-20 translate-y-16">
         <span 
-          style={{ WebkitTextStroke: '1px rgba(0,0,0,0.06)', color: 'transparent' }} 
-          className="prata-regular text-[18vw] sm:text-[14vw] uppercase leading-[0.75] tracking-tighter block text-center"
+          style={{ WebkitTextStroke: '1px rgba(0,0,0,0.04)', color: 'transparent' }} 
+          className="prata-regular text-[14vw] sm:text-[14vw] uppercase leading-[0.7] tracking-tighter block text-center opacity-80 sm:opacity-100"
         >
           GET YOUR <br />
           SELF INTO <br />
