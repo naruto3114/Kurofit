@@ -88,15 +88,6 @@ const Login = () => {
     }
   }, [token, navigate])
 
-  const switchMode = () => {
-    if (currentState === "Forgot") {
-      setCurrentState("Login")
-    } else {
-      setCurrentState(prev => prev === "Login" ? "Sign Up" : "Login")
-    }
-    setFormData({ name: "", email: "", password: "" })
-  }
-
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -111,7 +102,7 @@ const Login = () => {
           onSubmit={onSubmitHandler}
           className="w-full flex flex-col gap-6"
         >
-          <div className="text-center mb-6">
+          <div className="text-center mb-4">
             <motion.h2 
               key={currentState}
               initial={{ y: -10, opacity: 0 }}
@@ -120,13 +111,36 @@ const Login = () => {
             >
               {currentState}
             </motion.h2>
-            <p className="text-carbon-light text-xs mt-3 font-bold uppercase tracking-[0.2em]">
+            <p className="text-carbon-light text-[10px] font-black uppercase tracking-[0.2em] mt-3">
               {currentState === "Forgot" 
                 ? "Recover your account access" 
                 : currentState === "Login" 
                 ? "Access your premium experience" 
                 : "Join the exclusive circle"}
             </p>
+          </div>
+
+          {/* Auth Toggle */}
+          <div className="flex bg-zinc-100 p-1 rounded-2xl mb-2 relative">
+            <motion.div
+                animate={{ x: (currentState === "Login" || currentState === "Forgot") ? 0 : "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-white shadow-sm rounded-xl"
+            />
+            <button
+                type="button"
+                onClick={() => { setCurrentState("Login"); setFormData({ name: "", email: "", password: "" }) }}
+                className={`relative z-10 flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${(currentState === "Login" || currentState === "Forgot") ? "text-black" : "text-zinc-400 hover:text-zinc-600"}`}
+            >
+                Sign In
+            </button>
+            <button
+                type="button"
+                onClick={() => { setCurrentState("Sign Up"); setFormData({ name: "", email: "", password: "" }) }}
+                className={`relative z-10 flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${currentState === "Sign Up" ? "text-black" : "text-zinc-400 hover:text-zinc-600"}`}
+            >
+                Sign Up
+            </button>
           </div>
 
           <div className="space-y-4">
@@ -173,31 +187,21 @@ const Login = () => {
             )}
           </div>
 
-          <div className="flex justify-between items-center text-[11px] text-zinc-400 font-bold uppercase tracking-widest px-1 mt-2">
-             {currentState === "Login" && (
-               <p onClick={() => setCurrentState("Forgot")} className="cursor-pointer hover:text-black transition-colors">Forgot password?</p>
-             )}
-             <p
-              onClick={switchMode}
-              className={`cursor-pointer hover:text-black transition-colors underline underline-offset-8 decoration-zinc-200 hover:decoration-black decoration-2 ${currentState === "Forgot" ? "w-full text-center" : ""}`}
-            >
-              {currentState === "Forgot"
-                ? "Back to Login"
-                : currentState === "Login" 
-                ? "Create Account" 
-                : "Login Here"}
-            </p>
-          </div>
+          {currentState === "Login" && (
+            <div className="flex justify-end px-1 -mt-2">
+              <p onClick={() => setCurrentState("Forgot")} className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest cursor-pointer hover:text-black transition-colors">Forgot password?</p>
+            </div>
+          )}
 
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-black text-white py-5 rounded-2xl shadow-xl hover:shadow-2xl transition-all font-bold text-xs uppercase tracking-[0.25em] mt-6"
+            className="w-full bg-black text-white py-5 rounded-2xl shadow-xl hover:shadow-2xl transition-all font-bold text-xs uppercase tracking-[0.25em] mt-2"
           >
             {currentState === "Forgot" ? "Send Reset Link" : currentState === "Login" ? "Sign In" : "Register Now"}
           </motion.button>
 
-          <div className="flex items-center gap-4 my-6">
+          <div className="flex items-center gap-4 my-2">
             <hr className="flex-1 border-gray-100" />
             <span className="text-carbon-light text-[10px] font-bold uppercase tracking-[0.3em]">OR</span>
             <hr className="flex-1 border-gray-100" />
@@ -212,6 +216,7 @@ const Login = () => {
                 size="large"
                 text="continue_with"
                 shape="pill"
+                width="100%"
               />
             </div>
           </div>
