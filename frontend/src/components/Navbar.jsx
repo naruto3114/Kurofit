@@ -3,6 +3,7 @@ import { assets } from '../assets/assets';
 import { Link, NavLink } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 
 const Navbar = () => {
     const [visible, setVisible] = useState(false);
@@ -180,22 +181,164 @@ const Navbar = () => {
             </div>
         </div>
 
-        {/* ── Mobile Sidebar ── */}
-        <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all z-20 ${visible ? 'w-full' : 'w-0'}`}>
-            <div className='flex flex-col text-gray-600'>
-                <div onClick={() => setVisible(false)} className='flex items-center gap-4 p-3 cursor-pointer'>
-                    <img className='h-4 rotate-180' src={assets.dropdown_icon} alt="back" />
-                    <p>Back</p>
+        {/* ── Mobile Sidebar Overlay ── */}
+        <AnimatePresence>
+            {visible && (
+                <div className="fixed inset-0 z-[1000] lg:hidden">
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setVisible(false)}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                    />
+
+                    {/* Sidebar Content */}
+                    <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+                        className="absolute top-0 right-0 bottom-0 w-[85%] max-w-[380px] bg-white shadow-[0_0_50px_rgba(0,0,0,0.2)] flex flex-col h-full"
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-7 border-b border-gray-100 bg-white">
+                            <img src={assets.logo} className="w-32 brightness-0" alt="logo" />
+                            <button
+                                onClick={() => setVisible(false)}
+                                className="p-3 bg-gray-50 hover:bg-gray-100 rounded-full transition-all"
+                            >
+                                <X size={20} className="text-gray-900" />
+                            </button>
+                        </div>
+
+                        {/* Navigation Links */}
+                        <div className="flex-1 overflow-y-auto py-4 px-6 no-scrollbar">
+                            <div className="flex flex-col gap-1">
+                                <NavLink onClick={() => setVisible(false)} to="/" className="py-4 text-xs font-black uppercase tracking-[0.2em] border-b border-gray-50 flex items-center justify-between group">
+                                    Home
+                                    <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                                </NavLink>
+
+                                {/* Categories with Submenus */}
+                                <MobileAccordion title="Topwear" link="/collection?category=topwear" setVisible={setVisible}>
+                                    <Link to="/collection?category=topwear&subcategory=tshirt">T-Shirts</Link>
+                                    <Link to="/collection?category=topwear&subcategory=shirt">Shirts</Link>
+                                    <Link to="/collection?category=topwear&subcategory=hoodie">Hoodies</Link>
+                                    <Link to="/collection?category=topwear&subcategory=oversized">Oversized</Link>
+                                    <Link to="/collection?category=topwear&subcategory=vest">Vests</Link>
+                                </MobileAccordion>
+
+                                <MobileAccordion title="Bottomwear" link="/collection?category=bottomwear" setVisible={setVisible}>
+                                    <Link to="/collection?category=bottomwear&subcategory=jeans">Jeans</Link>
+                                    <Link to="/collection?category=bottomwear&subcategory=jogger">Joggers</Link>
+                                    <Link to="/collection?category=bottomwear&subcategory=trackpant">Trackpants</Link>
+                                    <Link to="/collection?category=bottomwear&subcategory=shorts">Shorts</Link>
+                                </MobileAccordion>
+
+                                <MobileAccordion title="Winterwear" link="/collection?category=winterwear" setVisible={setVisible}>
+                                    <Link to="/collection?category=winterwear&subcategory=jacket">Jackets</Link>
+                                    <Link to="/collection?category=winterwear&subcategory=sweatshirt">Sweatshirts</Link>
+                                </MobileAccordion>
+
+                                <NavLink onClick={() => setVisible(false)} to="/collection" className="py-4 text-xs font-black uppercase tracking-[0.2em] border-b border-gray-50 flex items-center justify-between group">
+                                    Collection
+                                    <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                                </NavLink>
+
+                                <NavLink onClick={() => setVisible(false)} to="/wishlist" className="py-4 text-xs font-black uppercase tracking-[0.2em] border-b border-gray-50 flex items-center justify-between group">
+                                    Wishlist
+                                    {wishlist.length > 0 && <span className="ml-2 bg-black text-white px-2 py-0.5 rounded-full text-[8px]">{wishlist.length}</span>}
+                                </NavLink>
+                            </div>
+                        </div>
+
+                        {/* Footer / Profile Section */}
+                        <div className="p-8 bg-gray-50 border-t border-gray-100">
+                            {token ? (
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold text-xs">
+                                            {assets.profile_icon ? <img src={assets.profile_icon} className="w-4 invert" alt="" /> : "U"}
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-black">Member</p>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Premium Account</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button onClick={() => { navigate('/my-profile'); setVisible(false); }} className="py-3 px-4 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors">Profile</button>
+                                        <button onClick={() => { navigate('/orders'); setVisible(false); }} className="py-3 px-4 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors">Orders</button>
+                                    </div>
+                                    <button onClick={() => { logout(); setVisible(false); }} className="w-full py-4 text-[10px] font-black uppercase tracking-widest text-red-500 border border-red-50 border-dashed rounded-xl mt-2">Log Out</button>
+                                </div>
+                            ) : (
+                                <button 
+                                    onClick={() => { setShowLogin(true); setVisible(false); }}
+                                    className="w-full py-5 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl"
+                                >
+                                    Login / Sign Up
+                                </button>
+                            )}
+                        </div>
+                    </motion.div>
                 </div>
-                <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/'>Home</NavLink>
-                <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/collection?category=topwear'>Topwear</NavLink>
-                <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/collection?category=bottomwear'>Bottomwear</NavLink>
-                <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/collection'>Collection</NavLink>
-                <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/wishlist'>Wishlist</NavLink>
-            </div>
-        </div>
+            )}
+        </AnimatePresence>
         </>
     )
 }
+
+const MobileAccordion = ({ title, children, link, setVisible }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const { navigate } = useContext(ShopContext);
+
+    return (
+        <div className="border-b border-gray-50">
+            <div className="flex items-center justify-between py-4">
+                <p 
+                    onClick={() => { navigate(link); setVisible(false); }}
+                    className="text-xs font-black uppercase tracking-[0.2em] text-black cursor-pointer"
+                >
+                    {title}
+                </p>
+                <button 
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="p-2 -mr-2 text-gray-400"
+                >
+                    <motion.svg 
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        className="w-4 h-4" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                    </motion.svg>
+                </button>
+            </div>
+            
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden bg-gray-50/50 rounded-xl mb-4"
+                    >
+                        <div className="flex flex-col gap-4 py-4 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                            {React.Children.map(children, child => (
+                                <div onClick={() => setVisible(false)}>
+                                    {child}
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 export default Navbar;

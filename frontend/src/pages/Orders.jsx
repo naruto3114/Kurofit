@@ -160,79 +160,79 @@ const Orders = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className='py-8 border border-gray-100 text-gray-700 flex flex-col lg:flex-row lg:items-center gap-8 bg-white rounded-3xl px-8 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500'
+                className='py-8 border border-gray-100 text-gray-700 flex flex-col lg:flex-row lg:items-center gap-8 bg-white rounded-3xl px-6 sm:px-8 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500'
               >
-                <div className='flex items-start gap-8 text-sm flex-1'>
+                <div className='flex items-center gap-6 sm:gap-8 text-sm flex-1'>
                   <div className='relative shrink-0'>
-                    <img className='w-24 sm:w-32 rounded-2xl shadow-sm cursor-pointer object-cover hover:scale-105 transition-transform duration-500' onClick={() => navigate(`/product/${item._id}`)} src={item.image[0]} alt="" />
-                    <div className='absolute -bottom-2 -right-2 bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm border border-gray-50 text-[10px] font-bold'>
+                    <img className='w-20 sm:w-32 rounded-2xl shadow-sm cursor-pointer object-cover hover:scale-105 transition-transform duration-500' onClick={() => navigate(`/product/${item._id}`)} src={item.image[0]} alt="" />
+                    <div className='absolute -bottom-2 -right-2 bg-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm border border-gray-50 text-[10px] font-bold'>
                       x{item.quantity}
                     </div>
                   </div>
-                  <div className='flex-1 py-1'>
-                    <p className='text-lg sm:text-xl font-black text-black tracking-tighter leading-tight mb-2 hover:text-gray-600 transition-colors cursor-pointer' onClick={() => navigate(`/product/${item._id}`)}>{item.name}</p>
-                    <div className='flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-400 font-medium'>
-                      <p className='text-black font-bold text-base'>{currency}{item.price}</p>
+                  <div className='flex-1 overflow-hidden'>
+                    <p className='text-base sm:text-xl font-black text-black tracking-tighter leading-tight mb-2 hover:text-gray-600 transition-colors cursor-pointer truncate' onClick={() => navigate(`/product/${item._id}`)}>{item.name}</p>
+                    <div className='flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-400 font-medium'>
+                      <p className='text-black font-bold text-sm sm:text-base'>{currency}{item.price}</p>
                       <span className='w-1 h-1 rounded-full bg-gray-200'></span>
-                      <p className='uppercase tracking-widest text-[9px] font-bold py-1 px-2 bg-gray-50 rounded'>Size: {item.size}</p>
+                      <p className='uppercase tracking-widest text-[8px] sm:text-[9px] font-black py-1 px-2 bg-gray-50 rounded'>Size: {item.size}</p>
                       <span className='w-1 h-1 rounded-full bg-gray-200 hidden sm:block'></span>
                       <p className='hidden sm:block uppercase tracking-wider text-[9px]'>{new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className='flex flex-col sm:flex-row items-center gap-8 lg:w-auto'>
-                  <div className='flex items-center gap-3 bg-gray-50/50 px-5 py-2.5 rounded-full border border-gray-100/50'>
+                <div className='flex flex-col sm:flex-row items-center justify-between sm:justify-end gap-6 lg:w-auto mt-4 sm:mt-0'>
+                  <div className='flex items-center gap-3 bg-gray-50/80 px-4 py-2 rounded-full border border-gray-100 w-fit'>
                     <p className={`w-1.5 h-1.5 rounded-full ${item.status === 'Delivered' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' :
                       item.status === 'Shipped' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]' :
                         item.status === 'Processing' || item.status === 'Packing' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.4)]' :
                           item.status === 'Cancelled' ? 'bg-red-500' : 
                             item.status === 'Return Requested' ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]' : 'bg-gray-400'
                       }`}></p>
-                    <p className='text-[9px] font-black uppercase tracking-[3px] text-gray-800'>{item.status}</p>
+                    <p className='text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] text-gray-800'>{item.status}</p>
                   </div>
                   
-                  <div className='flex flex-wrap justify-center items-center gap-3'>
+                  <div className='flex items-center gap-2 w-full sm:w-auto'>
                     {
                       item.status === 'Delivered' ? (
                         <>
                           <motion.button
-                            whileHover={{ scale: 1.02, backgroundColor: '#000', color: '#fff' }}
+                            whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => { setSelectedProduct(item); setShowReviewModal(true); }}
-                            className='bg-black text-white px-8 py-3.5 text-[9px] font-black uppercase tracking-[3px] rounded-xl transition-all shadow-lg shadow-black/5'
+                            className='flex-1 sm:flex-none bg-black text-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all shadow-lg'
                           >
                             Review
                           </motion.button>
                           {(Date.now() - (item.deliveredDate || item.date) < 7 * 24 * 60 * 60 * 1000) && (
                             <motion.button
-                              whileHover={{ scale: 1.02, backgroundColor: '#f9fafb' }}
+                              whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => { setSelectedProduct(item); setShowReturnModal(true); }}
-                              className='border border-gray-200 bg-white px-8 py-3.5 text-[9px] font-black uppercase tracking-[3px] rounded-xl transition-all'
+                              className='flex-1 sm:flex-none border border-gray-200 bg-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
                             >
                               Return
                             </motion.button>
                           )}
                         </>
                       ) : (
-                        <div className='flex gap-3'>
+                        <div className='flex gap-2 w-full sm:w-auto'>
                           {(item.status === 'Order Placed' || item.status === 'Packing') && (
                             <motion.button
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => { if (window.confirm("Cancel this order?")) handleCancelOrder(item.orderId) } }
-                              className='bg-red-50 text-red-600 border border-red-100 px-8 py-3.5 text-[9px] font-black uppercase tracking-[3px] rounded-xl hover:bg-red-600 hover:text-white transition-all'
+                              className='flex-1 sm:flex-none bg-red-50 text-red-600 border border-red-100 px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
                             >
                               Cancel
                             </motion.button>
                           )}
                           {item.status !== 'Cancelled' && (
                             <motion.button
-                              whileHover={{ scale: 1.02, backgroundColor: '#f9fafb' }}
+                              whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => { setSelectedProduct(item); setShowTrackModal(true); }}
-                              className='border border-gray-200 bg-white px-8 py-3.5 text-[9px] font-black uppercase tracking-[3px] rounded-xl transition-all'
+                              className='flex-1 sm:flex-none border border-gray-200 bg-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
                             >
                               Track
                             </motion.button>

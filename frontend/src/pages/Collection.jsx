@@ -239,116 +239,94 @@ const Collection = () => {
     <div className='pt-12 pb-32 page-entrance'>
 
 
+      {/* ── Mobile Floating Filter Button ── */}
+      <div className='fixed bottom-10 left-1/2 -translate-x-1/2 z-[45] sm:hidden'>
+        <motion.button 
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setShowFilter(true)}
+          className='bg-black text-white px-8 py-4 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.3)] flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap'
+        >
+          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth="2.5" d="M3 4h18M3 12h18M3 20h18" />
+          </svg>
+          Filter / Sort
+        </motion.button>
+      </div>
+
       <div className='flex flex-col sm:flex-row gap-12'>
-        {/* Filter Options */}
+        
+        {/* ── Filter Options (Desktop Sidebar / Mobile Tray) ── */}
         <div className='min-w-64'>
-          <AnimatePresence mode="wait">
-            {(showFilter || window.innerWidth > 640) && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className='flex flex-col gap-10'
-              >
-                {/* DYNAMIC CATEGORY FILTERS */}
-                <div className='bg-white border-t border-gray-100 pt-8'>
-                  <p className='mb-6 text-[11px] font-bold uppercase tracking-widest text-gray-900'>FILTERS</p>
-                  <div className='flex flex-col gap-6'>
-                    {displayCategories.map((cat) => (
-                      <div key={cat} className='flex flex-col gap-3'>
-                        <label className='flex items-center justify-between cursor-pointer group'>
-                          <div className='flex items-center gap-3'>
-                            <input
-                              className='w-5 h-5 rounded border-gray-300 text-zinc-900 focus:ring-zinc-900 cursor-pointer accent-zinc-900'
-                              type="checkbox"
-                              value={cat}
-                              onChange={toggleCategory}
-                              checked={selectedCategory === cat}
-                            />
-                            <span className={`text-[11px] font-bold uppercase tracking-widest transition-colors ${selectedCategory === cat ? 'text-blue-600' : 'text-gray-900 group-hover:text-black'}`}>{cat}</span>
-                          </div>
-                          <span className='text-[10px] font-medium text-gray-400'>{getProductCount('category', cat)}</span>
-                        </label>
-
-                        {/* Nested Subcategories */}
-                        <AnimatePresence>
-                          {selectedCategory === cat && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className='flex flex-col gap-3 ml-8 border-l border-gray-100 pl-4 overflow-hidden'
-                            >
-                              {CATEGORY_MAP[cat].map((sub) => (
-                                <label key={sub} className='flex items-center justify-between cursor-pointer group'>
-                                  <div className='flex items-center gap-3'>
-                                    <input
-                                      className='w-4 h-4 rounded border-gray-200 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600'
-                                      type="checkbox"
-                                      value={sub}
-                                      onChange={toggleSubCategory}
-                                      checked={selectedSubcategory === sub}
-                                    />
-                                    <span className={`text-[11px] font-medium transition-colors capitalize ${selectedSubcategory === sub ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-900'}`}>{sub}</span>
-                                  </div>
-                                  <span className='text-[10px] font-medium text-gray-400'>{getProductCount('subcategory', sub)}</span>
-                                </label>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    ))}
+          <AnimatePresence>
+            {showFilter && (
+              <>
+                {/* Mobile Tablet Overlay */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowFilter(false)}
+                  className='fixed inset-0 bg-black/40 backdrop-blur-sm z-[50] sm:hidden'
+                />
+                
+                {/* Mobile Slide-up Tray */}
+                <motion.div
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  className='fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] z-[60] p-10 max-h-[85vh] overflow-y-auto sm:hidden shadow-[0_-20px_50px_rgba(0,0,0,0.1)]'
+                >
+                  <div className='flex justify-between items-center mb-10'>
+                    <h2 className='text-xl font-bold uppercase tracking-widest'>Refine</h2>
+                    <button onClick={() => setShowFilter(false)} className='p-2 bg-gray-50 rounded-full'>
+                      <X size={20} />
+                    </button>
                   </div>
-                </div>
+                  
+                  <FilterContent 
+                    displayCategories={displayCategories}
+                    selectedCategory={selectedCategory}
+                    toggleCategory={toggleCategory}
+                    getProductCount={getProductCount}
+                    CATEGORY_MAP={CATEGORY_MAP}
+                    selectedSubcategory={selectedSubcategory}
+                    toggleSubCategory={toggleSubCategory}
+                    selectedSizes={selectedSizes}
+                    toggleSize={toggleSize}
+                    priceRange={priceRange}
+                    togglePriceRange={togglePriceRange}
+                    PRICE_MAP={PRICE_MAP}
+                  />
 
-                {/* SIZES Filter */}
-                <div className='bg-white border-t border-gray-100 pt-8'>
-                  <p className='mb-6 text-[11px] font-bold uppercase tracking-widest text-gray-900'>SIZES</p>
-                  <div className='grid grid-cols-4 gap-2'>
-                    {(selectedCategory === 'bottomwear'
-                      ? ['26', '28', '30', '32', '34', '36', '38', '40']
-                      : ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
-                    ).map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => toggleSize(size)}
-                        className={`w-10 h-10 border text-[10px] font-bold transition-all flex items-center justify-center rounded-lg ${selectedSizes.includes(size)
-                            ? 'bg-black text-white border-black shadow-lg shadow-black/10'
-                            : 'bg-white text-gray-900 border-gray-100 hover:border-gray-900'
-                          }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-
-                {/* PRICE Filter */}
-                <div className='bg-white border-t border-gray-100 pt-8'>
-                  <p className='mb-6 text-[11px] font-bold uppercase tracking-widest text-gray-900'>PRICE</p>
-                  <div className='flex flex-col gap-4'>
-                    {Object.keys(PRICE_MAP).map((range) => (
-                      <label key={range} className='flex items-center justify-between cursor-pointer group'>
-                        <div className='flex items-center gap-3'>
-                          <input
-                            className='w-5 h-5 rounded border-gray-300 text-zinc-900 focus:ring-zinc-900 cursor-pointer accent-zinc-900'
-                            type="checkbox"
-                            value={range}
-                            onChange={togglePriceRange}
-                            checked={priceRange.includes(range)}
-                          />
-                          <span className='text-[12px] font-medium text-gray-500 group-hover:text-gray-900 transition-colors'>₹{range.replace('+', ' and above')}</span>
-                        </div>
-                        <span className='text-[10px] font-medium text-gray-400'>{getProductCount('price', range)}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-              </motion.div>
+                  <button 
+                    onClick={() => setShowFilter(false)}
+                    className='w-full bg-black text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] mt-10 shadow-xl'
+                  >
+                    View Products
+                  </button>
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
+
+          {/* Desktop Sidebar (Stateless) */}
+          <div className='hidden sm:block'>
+            <FilterContent 
+              displayCategories={displayCategories}
+              selectedCategory={selectedCategory}
+              toggleCategory={toggleCategory}
+              getProductCount={getProductCount}
+              CATEGORY_MAP={CATEGORY_MAP}
+              selectedSubcategory={selectedSubcategory}
+              toggleSubCategory={toggleSubCategory}
+              selectedSizes={selectedSizes}
+              toggleSize={toggleSize}
+              priceRange={priceRange}
+              togglePriceRange={togglePriceRange}
+              PRICE_MAP={PRICE_MAP}
+            />
+          </div>
         </div>
 
         {/* Right Side */}
@@ -512,5 +490,121 @@ const Collection = () => {
     </div>
   )
 }
+
+const FilterContent = ({ 
+    displayCategories, 
+    selectedCategory, 
+    toggleCategory, 
+    getProductCount, 
+    CATEGORY_MAP, 
+    selectedSubcategory, 
+    toggleSubCategory, 
+    selectedSizes, 
+    toggleSize, 
+    priceRange, 
+    togglePriceRange, 
+    PRICE_MAP 
+}) => (
+    <div className='flex flex-col gap-12 sm:gap-10 pb-10 sm:pb-0'>
+        {/* DYNAMIC CATEGORY FILTERS */}
+        <div className='bg-white sm:border-t border-gray-100 sm:pt-8'>
+            <p className='mb-8 sm:mb-6 text-[11px] font-black uppercase tracking-[0.2em] text-gray-900'>CATEGORIES</p>
+            <div className='flex flex-col gap-8 sm:gap-6'>
+                {displayCategories.map((cat) => (
+                    <div key={cat} className='flex flex-col gap-4'>
+                        <label className='flex items-center justify-between cursor-pointer group'>
+                            <div className='flex items-center gap-4'>
+                                <div className="relative flex items-center">
+                                    <input
+                                        className='w-6 h-6 sm:w-5 sm:h-5 rounded-lg border-gray-200 text-black focus:ring-black cursor-pointer accent-black transition-all'
+                                        type="checkbox"
+                                        value={cat}
+                                        onChange={toggleCategory}
+                                        checked={selectedCategory === cat}
+                                    />
+                                </div>
+                                <span className={`text-xs font-black uppercase tracking-widest transition-colors ${selectedCategory === cat ? 'text-black' : 'text-gray-400 group-hover:text-black'}`}>{cat}</span>
+                            </div>
+                            <span className='text-[10px] font-bold text-gray-300'>{getProductCount('category', cat)}</span>
+                        </label>
+
+                        {/* Nested Subcategories */}
+                        <AnimatePresence>
+                            {selectedCategory === cat && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className='flex flex-col gap-5 ml-10 border-l-2 border-gray-50 pl-6 overflow-hidden'
+                                >
+                                    {CATEGORY_MAP[cat].map((sub) => (
+                                        <label key={sub} className='flex items-center justify-between cursor-pointer group'>
+                                            <div className='flex items-center gap-4'>
+                                                <input
+                                                    className='w-5 h-5 sm:w-4 sm:h-4 rounded border-gray-200 text-black focus:ring-black cursor-pointer accent-black'
+                                                    type="checkbox"
+                                                    value={sub}
+                                                    onChange={toggleSubCategory}
+                                                    checked={selectedSubcategory === sub}
+                                                />
+                                                <span className={`text-[11px] font-bold transition-colors capitalize tracking-wider ${selectedSubcategory === sub ? 'text-black font-black' : 'text-gray-400 group-hover:text-gray-900'}`}>{sub}</span>
+                                            </div>
+                                            <span className='text-[10px] font-bold text-gray-300'>{getProductCount('subcategory', sub)}</span>
+                                        </label>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* SIZES Filter */}
+        <div className='bg-white border-t border-gray-100 pt-10 sm:pt-8'>
+            <p className='mb-8 sm:mb-6 text-[11px] font-black uppercase tracking-[0.2em] text-gray-900'>SIZES</p>
+            <div className='grid grid-cols-4 gap-3 sm:gap-2'>
+                {(selectedCategory === 'bottomwear'
+                    ? ['26', '28', '30', '32', '34', '36', '38', '40']
+                    : ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+                ).map((size) => (
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        key={size}
+                        onClick={() => toggleSize(size)}
+                        className={`w-full aspect-square sm:w-10 sm:h-10 border text-[10px] font-black transition-all flex items-center justify-center rounded-xl sm:rounded-lg ${selectedSizes.includes(size)
+                            ? 'bg-black text-white border-black shadow-xl shadow-black/20'
+                            : 'bg-white text-gray-400 border-gray-100 hover:border-gray-900'
+                            }`}
+                    >
+                        {size}
+                    </motion.button>
+                ))}
+            </div>
+        </div>
+
+        {/* PRICE Filter */}
+        <div className='bg-white border-t border-gray-100 pt-10 sm:pt-8'>
+            <p className='mb-8 sm:mb-6 text-[11px] font-black uppercase tracking-[0.2em] text-gray-900'>PRICE RANGE</p>
+            <div className='flex flex-col gap-6 sm:gap-4'>
+                {Object.keys(PRICE_MAP).map((range) => (
+                    <label key={range} className='flex items-center justify-between cursor-pointer group'>
+                        <div className='flex items-center gap-4'>
+                            <input
+                                className='w-6 h-6 sm:w-5 sm:h-5 rounded-lg border-gray-200 text-black focus:ring-black cursor-pointer accent-black'
+                                type="checkbox"
+                                value={range}
+                                onChange={togglePriceRange}
+                                checked={priceRange.includes(range)}
+                            />
+                            <span className='text-[12px] font-bold text-gray-400 group-hover:text-black transition-colors'>₹{range.replace('+', ' and above')}</span>
+                        </div>
+                        <span className='text-[10px] font-bold text-gray-300'>{getProductCount('price', range)}</span>
+                    </label>
+                ))}
+            </div>
+        </div>
+    </div>
+);
 
 export default Collection;

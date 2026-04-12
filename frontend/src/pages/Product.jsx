@@ -162,13 +162,13 @@ const Product = () => {
     <div className='pt-10 pb-20 border-t border-gray-100 page-entrance'>
 
       {/* ── Product Layout ── */}
-      <div className='flex gap-10 flex-col lg:flex-row items-start'>
+      <div className='flex flex-col lg:flex-row gap-16 lg:gap-10 items-start w-full'>
 
         {/* ── LEFT: Images ── */}
-        <div className='flex-1 flex flex-col-reverse gap-3 sm:flex-row w-full lg:max-w-[650px] sticky top-24'>
+        <div className='w-full lg:flex-1 flex flex-col-reverse gap-4 sm:flex-row lg:max-w-[650px] lg:sticky lg:top-24'>
 
           {/* Thumbnails */}
-          <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-auto no-scrollbar sm:w-[15%] w-full gap-2'>
+          <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-auto no-scrollbar sm:w-[18%] w-full gap-3 py-4 sm:py-0'>
             {productData.image.map((item, index) => (
               <motion.img
                 whileHover={{ scale: 1.04 }}
@@ -176,14 +176,14 @@ const Product = () => {
                 onClick={() => setImage(item)}
                 src={item}
                 key={index}
-                className={`w-[20%] sm:w-full rounded-lg cursor-pointer border-2 transition-all duration-200 ${image === item ? 'border-black' : 'border-transparent opacity-60 hover:opacity-90'}`}
+                className={`w-[70px] h-[70px] sm:w-full sm:h-auto rounded-xl cursor-pointer border-2 transition-all duration-200 object-cover shrink-0 ${image === item ? 'border-black' : 'border-transparent opacity-60 hover:opacity-90'}`}
                 alt=""
               />
             ))}
           </div>
 
           {/* Main image */}
-          <div className='w-full sm:w-[85%] relative overflow-hidden rounded-2xl bg-gray-50 border border-gray-100'>
+          <div className='w-full sm:w-[82%] relative overflow-hidden rounded-[2.5rem] bg-gray-50 border border-gray-100 shadow-sm'>
             <AnimatePresence mode="wait">
               <motion.img
                 key={image}
@@ -191,7 +191,7 @@ const Product = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.35 }}
-                className='w-full h-[520px] sm:h-[680px] object-cover object-top'
+                className='w-full h-[480px] sm:h-[680px] object-cover object-top'
                 src={image}
                 alt={productData.name}
               />
@@ -200,12 +200,12 @@ const Product = () => {
         </div>
 
         {/* ── RIGHT: Product Info ── */}
-        <div className='flex-1 w-full'>
+        <div className='w-full lg:flex-1'>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className='flex flex-col gap-5'
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className='flex flex-col gap-6'
           >
 
             {/* Brand label */}

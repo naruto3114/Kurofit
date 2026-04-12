@@ -17,12 +17,12 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[calc(100vh-92px)] bg-white w-full overflow-hidden">
+    <section className="relative min-h-[500px] sm:min-h-[calc(100vh-92px)] bg-white w-full overflow-hidden flex items-center">
       {/* Background Editorial Accent */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden translate-y-20">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden sm:translate-y-20 translate-y-10">
         <span 
-          style={{ WebkitTextStroke: '1px rgba(0,0,0,0.08)', color: 'transparent' }} 
-          className="prata-regular text-[14vw] uppercase leading-[0.75] tracking-tighter block text-center"
+          style={{ WebkitTextStroke: '1px rgba(0,0,0,0.06)', color: 'transparent' }} 
+          className="prata-regular text-[18vw] sm:text-[14vw] uppercase leading-[0.75] tracking-tighter block text-center"
         >
           GET YOUR <br />
           SELF INTO <br />
@@ -30,21 +30,21 @@ const Hero = () => {
         </span>
       </div>
 
-      <div className="relative z-10 flex min-h-[calc(100vh-92px)] w-full flex-col-reverse items-center justify-center gap-10 px-4 md:flex-row">
+      <div className="relative z-10 flex w-full flex-col-reverse items-center justify-center gap-10 px-4 md:flex-row py-10 sm:py-0">
 
         {/* LEFT */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7 }}
-          className="w-full md:w-1/2"
+          className="w-full md:w-1/2 text-center md:text-left"
         >
 
 
-          <h1 className="mt-6 text-[2.8rem] leading-[1.05] tracking-[-0.02em] text-black sm:text-[3.8rem] lg:text-[5rem] xl:text-[5.5rem]">
-            Elevate Your <br />
-            Shopping <br />
-            Experience <br />
+          <h1 className="mt-6 text-[2.2rem] leading-[1.1] tracking-[-0.02em] text-black sm:text-[3.8rem] lg:text-[5rem] xl:text-[5.5rem]">
+            Elevate Your <br className="hidden sm:block" />
+            Shopping <br className="hidden sm:block" />
+            Experience <br className="hidden sm:block" />
             Today!
           </h1>
 
