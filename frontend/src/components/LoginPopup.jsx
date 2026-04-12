@@ -32,15 +32,6 @@ const LoginPopup = () => {
         }
     }, [showLogin])
 
-    if (!showLogin) return null
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        })
-    }
-
     const handleGoogleSuccess = async (tokenResponse) => {
         try {
             setLoading(true)
@@ -66,6 +57,17 @@ const LoginPopup = () => {
         onSuccess: handleGoogleSuccess,
         onError: () => toast.error("Google Login Failed")
     })
+
+    if (!showLogin) return null
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        })
+    }
+
+
 
     const onSubmitHandler = async (e) => {
         e.preventDefault()

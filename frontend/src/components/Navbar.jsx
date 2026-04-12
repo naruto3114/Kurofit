@@ -132,7 +132,7 @@ const Navbar = () => {
                         alt="profile"
                     />
                     {token && (
-                        <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4 z-10'>
+                        <div className='absolute top-full right-0 pt-4 z-50 hidden group-hover:block'>
                             <motion.div 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}

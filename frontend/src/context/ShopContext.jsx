@@ -8,14 +8,14 @@ export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
     const currency = '₹';
     const delivery_fee = 50; // Base delivery fee
-    const backendUrl = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+    const backendUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [cartItems, setCartItems] = useState({});
     const [wishlist, setWishlist] = useState([]);
     const [products, setProducts] = useState([]);
-    const [token, setToken] = useState('');
+    const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
     const [userData, setUserData] = useState(null);
     const [userAddresses, setUserAddresses] = useState([]);
     const [categories, setCategories] = useState([]);

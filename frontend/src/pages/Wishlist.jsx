@@ -4,7 +4,7 @@ import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
 
 const Wishlist = () => {
-    const { products, wishlist } = useContext(ShopContext);
+    const { products, wishlist, navigate } = useContext(ShopContext);
     const [wishlistProducts, setWishlistProducts] = useState([]);
 
     useEffect(() => {
