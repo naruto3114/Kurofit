@@ -236,19 +236,33 @@ const getUserWishlist = async (req, res) => {
 // Route for Google Login
 const googleLogin = async (req, res) => {
     try {
-        const { token: googleToken, credential } = req.body;
-        const idToken = googleToken || credential;
+        const { token: googleToken, credential, is_access_token } = req.body;
+        const inputToken = googleToken || credential;
 
-        if (!idToken) {
-            return res.json({ success: false, message: "ID Token is required" });
+        if (!inputToken) {
+            return res.json({ success: false, message: "Token is required" });
         }
 
-        const ticket = await client.verifyIdToken({
-            idToken: idToken,
-            audience: process.env.GOOGLE_CLIENT_ID
-        });
+        let userData;
 
-        const { name, email, picture } = ticket.getPayload();
+        if (is_access_token) {
+            // Verify access token by calling Google's UserInfo API
+            const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${inputToken}`);
+            userData = await response.json();
+            
+            if (!userData.email) {
+                return res.json({ success: false, message: "Invalid Access Token or expired" });
+            }
+        } else {
+            // Verify ID Token (standard component flow)
+            const ticket = await client.verifyIdToken({
+                idToken: inputToken,
+                audience: process.env.GOOGLE_CLIENT_ID
+            });
+            userData = ticket.getPayload();
+        }
+
+        const { name, email, picture } = userData;
 
         let user = await userModel.findOne({ email });
 
