@@ -1,0 +1,13 @@
+a.active {
+  background-color: #ffebed;
+  border-color: #ff4d67;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}

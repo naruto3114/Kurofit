@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Prata&display=swap');
+
+/* Unified Admin & Storefront Foundation */
+* {
+    font-family: 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: #ffffff; /* Clean white base from admin dashboard */
+    color: #111827; /* gray-900: Deep charcoal for better readability */
+}
+
+/* Brand Serif Signature */
+.prata-regular {
+    font-family: "Prata", serif;
+}
+
+/* Unified Navigation Transitions */
+a.active hr {
+    display: block;
+}
+
+/* Mobile Sidebar Sync */
+@media (max-width: 640px) {
+    a.active {
+        background-color: #111827; /* gray-900 sync */
+        color: white;
+    }
+}
+
+/* Global Hidden Scrollbar (Admin Standard) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Unified Card & Elevation Helpers */
+.glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(243, 244, 246, 1); /* border-gray-100 */
+}
+
+/* Page Entrance Animation */
+.page-entrance {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
