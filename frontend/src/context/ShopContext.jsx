@@ -8,7 +8,7 @@ export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
     const currency = '₹';
     const delivery_fee = 50; // Base delivery fee
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
@@ -39,9 +39,19 @@ const ShopContextProvider = (props) => {
         toast.error(error.response?.data?.message || error.message || fallbackMessage);
     }
 
+    const getApiUrl = (path) => {
+        if (!backendUrl) {
+            return null;
+        }
+
+        return `${backendUrl}${path}`;
+    }
+
     const getUserProfile = async (token) => {
+        const profileUrl = getApiUrl('/api/user/profile');
+        if (!profileUrl) return;
         try {
-            const response = await axios.get(backendUrl + '/api/user/profile', { headers: { token } })
+            const response = await axios.get(profileUrl, { headers: { token } })
             if (response.data.success) {
                 setUserData(response.data.userData)
                 setUserAddresses(response.data.userData.addresses || [])
@@ -53,8 +63,10 @@ const ShopContextProvider = (props) => {
 
     const addUserAddress = async (address) => {
         if (token) {
+            const addAddressUrl = getApiUrl('/api/user/add-address');
+            if (!addAddressUrl) return false;
             try {
-                const response = await axios.post(backendUrl + '/api/user/add-address', { address }, { headers: { token } })
+                const response = await axios.post(addAddressUrl, { address }, { headers: { token } })
                 if (response.data.success) {
                     toast.success(response.data.message)
                     getUserProfile(token)
@@ -69,8 +81,10 @@ const ShopContextProvider = (props) => {
 
     const removeUserAddress = async (index) => {
         if (token) {
+            const removeAddressUrl = getApiUrl('/api/user/remove-address');
+            if (!removeAddressUrl) return;
             try {
-                const response = await axios.post(backendUrl + '/api/user/remove-address', { index }, { headers: { token } })
+                const response = await axios.post(removeAddressUrl, { index }, { headers: { token } })
                 if (response.data.success) {
                     toast.success(response.data.message)
                     getUserProfile(token)
@@ -83,8 +97,10 @@ const ShopContextProvider = (props) => {
 
     const updateUserAddress = async (index, address) => {
         if (token) {
+            const updateAddressUrl = getApiUrl('/api/user/update-address');
+            if (!updateAddressUrl) return false;
             try {
-                const response = await axios.post(backendUrl + '/api/user/update-address', { index, address }, { headers: { token } })
+                const response = await axios.post(updateAddressUrl, { index, address }, { headers: { token } })
                 if (response.data.success) {
                     toast.success(response.data.message)
                     getUserProfile(token)
@@ -124,8 +140,10 @@ const ShopContextProvider = (props) => {
         setCartItems(cartData);
 
         if (token) {
+            const addToCartUrl = getApiUrl('/api/cart/add');
+            if (!addToCartUrl) return;
             try {
-                await axios.post(backendUrl + '/api/cart/add', { itemId, size }, { headers: { token } })
+                await axios.post(addToCartUrl, { itemId, size }, { headers: { token } })
             } catch (error) {
                 handleApiError(error)
             }
@@ -154,8 +172,10 @@ const ShopContextProvider = (props) => {
         setCartItems(cartData);
 
         if (token) {
+            const updateCartUrl = getApiUrl('/api/cart/update');
+            if (!updateCartUrl) return;
             try {
-                await axios.post(backendUrl + '/api/cart/update', { itemId, size, quantity }, { headers: { token } })
+                await axios.post(updateCartUrl, { itemId, size, quantity }, { headers: { token } })
             } catch (error) {
                 handleApiError(error)
             }
@@ -195,8 +215,10 @@ const ShopContextProvider = (props) => {
         setCartItems(cartData);
 
         if (token) {
+            const removeFromCartUrl = getApiUrl('/api/cart/update');
+            if (!removeFromCartUrl) return;
             try {
-                await axios.post(backendUrl + '/api/cart/update', { itemId, size, quantity: 0 }, { headers: { token } })
+                await axios.post(removeFromCartUrl, { itemId, size, quantity: 0 }, { headers: { token } })
             } catch (error) {
                 handleApiError(error)
             }
@@ -225,11 +247,13 @@ const ShopContextProvider = (props) => {
 
             // Backend sync
             if (token) {
+                const updateCartUrl = getApiUrl('/api/cart/update');
+                if (!updateCartUrl) return;
                 try {
                     // Set old size quantity to 0
-                    await axios.post(backendUrl + '/api/cart/update', { itemId, size: oldSize, quantity: 0 }, { headers: { token } })
+                    await axios.post(updateCartUrl, { itemId, size: oldSize, quantity: 0 }, { headers: { token } })
                     // Set new size to updated quantity
-                    await axios.post(backendUrl + '/api/cart/update', { itemId, size: newSize, quantity: cartData[itemId][newSize] }, { headers: { token } })
+                    await axios.post(updateCartUrl, { itemId, size: newSize, quantity: cartData[itemId][newSize] }, { headers: { token } })
                 } catch (error) {
                     handleApiError(error)
                 }
@@ -238,8 +262,10 @@ const ShopContextProvider = (props) => {
     }
 
     const getUserCart = async (token) => {
+        const getCartUrl = getApiUrl('/api/cart/get');
+        if (!getCartUrl) return;
         try {
-            const response = await axios.post(backendUrl + '/api/cart/get', {}, { headers: { token } })
+            const response = await axios.post(getCartUrl, {}, { headers: { token } })
             if (response.data.success) {
                 hasShownBackendOfflineToast.current = false;
                 setCartItems(response.data.cartData)
@@ -250,8 +276,10 @@ const ShopContextProvider = (props) => {
     }
 
     const getUserWishlist = async (token) => {
+        const wishlistUrl = getApiUrl('/api/user/wishlist');
+        if (!wishlistUrl) return;
         try {
-            const response = await axios.get(backendUrl + '/api/user/wishlist', { headers: { token } })
+            const response = await axios.get(wishlistUrl, { headers: { token } })
             if (response.data.success) {
                 hasShownBackendOfflineToast.current = false;
                 setWishlist(response.data.wishlistData)
@@ -268,8 +296,10 @@ const ShopContextProvider = (props) => {
             setWishlist(wishlistCopy);
             toast.success('Removed from Wishlist');
             if (token) {
+                const removeWishlistUrl = getApiUrl('/api/user/remove-wishlist');
+                if (!removeWishlistUrl) return;
                 try {
-                    await axios.post(backendUrl + '/api/user/remove-wishlist', { itemId }, { headers: { token } })
+                    await axios.post(removeWishlistUrl, { itemId }, { headers: { token } })
                 } catch (error) {
                     handleApiError(error);
                 }
@@ -279,8 +309,10 @@ const ShopContextProvider = (props) => {
             setWishlist(wishlistCopy);
             toast.success('Added to Wishlist');
             if (token) {
+                const addWishlistUrl = getApiUrl('/api/user/add-wishlist');
+                if (!addWishlistUrl) return;
                 try {
-                    await axios.post(backendUrl + '/api/user/add-wishlist', { itemId }, { headers: { token } })
+                    await axios.post(addWishlistUrl, { itemId }, { headers: { token } })
                 } catch (error) {
                     handleApiError(error);
                 }
@@ -289,8 +321,13 @@ const ShopContextProvider = (props) => {
     }
 
     const getProductsData = async (filters = {}) => {
+        const productListUrl = getApiUrl('/api/product/list');
+        if (!productListUrl) {
+            setProducts([]);
+            return;
+        }
         try {
-            const queryParams = new URL(backendUrl + '/api/product/list');
+            const queryParams = new URL(productListUrl);
             Object.keys(filters).forEach(key => {
                 if (filters[key]) {
                     queryParams.searchParams.append(key, Array.isArray(filters[key]) ? filters[key].join(',') : filters[key]);
@@ -310,8 +347,14 @@ const ShopContextProvider = (props) => {
     }
 
     const fetchCategories = async () => {
+        const categoriesUrl = getApiUrl('/api/product/categories');
+        if (!categoriesUrl) {
+            setCategories([]);
+            setSubCategories([]);
+            return;
+        }
         try {
-            const response = await axios.get(backendUrl + '/api/product/categories')
+            const response = await axios.get(categoriesUrl)
             if (response.data.success) {
                 setCategories(response.data.categories || [])
                 setSubCategories(response.data.subcategories || [])
@@ -327,7 +370,9 @@ const ShopContextProvider = (props) => {
             return { success: false };
         }
         try {
-            const response = await axios.post(backendUrl + '/api/reviews/add', { productId, rating, comment }, { headers: { token } });
+            const addReviewUrl = getApiUrl('/api/reviews/add');
+            if (!addReviewUrl) return { success: false };
+            const response = await axios.post(addReviewUrl, { productId, rating, comment }, { headers: { token } });
             if (response.data.success) {
                 toast.success(response.data.message);
                 return { success: true };
@@ -342,8 +387,10 @@ const ShopContextProvider = (props) => {
     }
 
     const getProductReviews = async (productId) => {
+        const productReviewsUrl = getApiUrl('/api/reviews/product');
+        if (!productReviewsUrl) return [];
         try {
-            const response = await axios.post(backendUrl + '/api/reviews/product', { productId });
+            const response = await axios.post(productReviewsUrl, { productId });
             if (response.data.success) {
                 return response.data.reviews;
             }
@@ -360,7 +407,9 @@ const ShopContextProvider = (props) => {
             return { success: false };
         }
         try {
-            const response = await axios.post(backendUrl + '/api/reviews/delete', { reviewId }, { headers: { token } });
+            const deleteReviewUrl = getApiUrl('/api/reviews/delete');
+            if (!deleteReviewUrl) return { success: false };
+            const response = await axios.post(deleteReviewUrl, { reviewId }, { headers: { token } });
             if (response.data.success) {
                 toast.success(response.data.message);
                 return { success: true };
@@ -379,6 +428,12 @@ const ShopContextProvider = (props) => {
         if (storedToken) {
             setToken(storedToken);
         }
+
+        if (!backendUrl && !hasShownBackendOfflineToast.current) {
+            toast.error('Backend URL is not configured. Set VITE_BACKEND_URL in the frontend environment.');
+            hasShownBackendOfflineToast.current = true;
+        }
+
         getProductsData();
         fetchCategories();
     }, [])
@@ -403,7 +458,9 @@ const ShopContextProvider = (props) => {
             return { success: false };
         }
         try {
-            const response = await axios.post(backendUrl + '/api/order/return', { orderId, reason }, { headers: { token } });
+            const returnOrderUrl = getApiUrl('/api/order/return');
+            if (!returnOrderUrl) return { success: false };
+            const response = await axios.post(returnOrderUrl, { orderId, reason }, { headers: { token } });
             if (response.data.success) {
                 toast.success(response.data.message);
                 return { success: true };
