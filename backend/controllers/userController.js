@@ -5,7 +5,7 @@ import userModel from "../models/userModel.js";
 import { v2 as cloudinary } from 'cloudinary'
 import { OAuth2Client } from 'google-auth-library'
 import crypto from 'crypto'
-import { mailtrapClient, mailtrapSender } from "../config/mailtrap.js";
+import transporter from "../config/nodemailer.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -338,13 +338,14 @@ const forgotPassword = async (req, res) => {
         const message = `You are receiving this email because you (or someone else) have requested the reset of a password. Please make a click on the following link to complete the process:\n\n ${resetUrl} \n\n If you did not request this, please ignore this email and your password will remain unchanged.`;
 
         try {
-            await mailtrapClient.send({
-                from: mailtrapSender,
-                to: [{ email: user.email }],
+            const mailOptions = {
+                from: `Kurofit Store <${process.env.GMAIL_USER}>`,
+                to: user.email,
                 subject: 'Password Reset Request',
                 text: message,
-                category: "Password Reset",
-            });
+            };
+
+            await transporter.sendMail(mailOptions);
 
             res.json({ success: true, message: "Email sent" });
         } catch (error) {
