@@ -34,12 +34,17 @@ const Dashboard = ({ token }) => {
         const currentYear  = new Date().getFullYear()
 
         // Current-month stats
-        const monthlyOrders = allOrders.filter(order => {
+        const currentMonthOrders = allOrders.filter(order => {
           const d = new Date(order.date)
-          return d.getMonth() === currentMonth && d.getFullYear() === currentYear && order.status !== 'Cancelled'
+          return d.getMonth() === currentMonth && d.getFullYear() === currentYear
         })
-        setMonthlyRevenue(monthlyOrders.reduce((acc, o) => acc + o.amount, 0))
-        setMonthlyOrderCount(monthlyOrders.length)
+
+        const activeCurrentMonthOrders = currentMonthOrders.filter(order => !['Cancelled', 'Refunded', 'Returned'].includes(order.status))
+        
+        setMonthlyOrderCount(activeCurrentMonthOrders.length)
+        
+        const validRevenueOrders = activeCurrentMonthOrders.filter(order => order.payment)
+        setMonthlyRevenue(validRevenueOrders.reduce((acc, o) => acc + o.amount, 0))
 
         // Last 6 months chart data
         const last6 = Array.from({ length: 6 }, (_, i) => {
@@ -49,14 +54,14 @@ const Dashboard = ({ token }) => {
         })
 
         allOrders.forEach(order => {
-          if (order.status === 'Cancelled') return
+          if (['Cancelled', 'Refunded', 'Returned'].includes(order.status)) return
 
           const d   = new Date(order.date)
           const mon = MONTH_NAMES[d.getMonth()]
           const yr  = d.getFullYear()
           const slot = last6.find(s => s.month === mon && s.year === yr)
           if (slot) {
-            slot.sales  += order.amount
+            if (order.payment) slot.sales += order.amount
             slot.orders += 1
           }
         })

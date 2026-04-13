@@ -13,11 +13,15 @@ const STATUS_COLORS = {
   'Delivered':       'bg-green-100 text-green-700',
   'Cancelled':       'bg-red-100 text-red-700',
   'Return Requested':'bg-orange-100 text-orange-700',
+  'Approved':        'bg-yellow-100 text-yellow-700',
+  'Pickup Initiated':'bg-indigo-100 text-indigo-700',
+  'Return Received': 'bg-purple-100 text-purple-700',
   'Returned':        'bg-purple-100 text-purple-700',
   'Refunded':        'bg-zinc-100 text-zinc-900',
 }
 
-const ALL_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for delivery', 'Delivered', 'Cancelled', 'Return Requested', 'Returned', 'Refunded']
+const DELIVERY_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for delivery', 'Delivered', 'Cancelled']
+const RETURN_STATUSES = ['Return Requested', 'Approved', 'Pickup Initiated', 'Return Received', 'Refunded']
 
 const Orders = ({ token }) => {
   const [orders, setOrders]             = useState([])
@@ -93,10 +97,10 @@ const Orders = ({ token }) => {
     return matchesSearch && matchesStatus
   })
 
-  const totalRevenue   = orders.filter(o => !['Cancelled', 'Refunded'].includes(o.status)).reduce((sum, o) => sum + o.amount, 0)
+  const totalRevenue   = orders.filter(o => !['Cancelled', 'Refunded', 'Returned'].includes(o.status) && o.payment).reduce((sum, o) => sum + o.amount, 0)
   const totalOrders    = orders.length
   const pendingOrders  = orders.filter(o =>
-    !['Delivered', 'Cancelled'].includes(o.status)
+    !['Delivered', 'Cancelled', 'Refunded', 'Returned'].includes(o.status)
   ).length
 
   // ── render ─────────────────────────────────────────────────────────────────
@@ -167,9 +171,16 @@ const Orders = ({ token }) => {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
           >
             <option value="All">All Status</option>
-            {ALL_STATUSES.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+            <optgroup label="Delivery">
+              {DELIVERY_STATUSES.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Returns">
+              {RETURN_STATUSES.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </optgroup>
           </select>
         </div>
       </div>
@@ -269,11 +280,11 @@ const Orders = ({ token }) => {
                       <select
                         value={order.status}
                         onChange={e => statusHandler(e, order._id)}
-                        disabled={order.status === 'Cancelled' || order.status === 'Delivered'}
+                        disabled={['Cancelled', 'Delivered', 'Refunded'].includes(order.status)}
                         className="block w-full text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <option disabled>Change Status</option>
-                        {ALL_STATUSES.map(s => (
+                        {(RETURN_STATUSES.includes(order.status) || order.status === 'Returned' ? RETURN_STATUSES : DELIVERY_STATUSES).map(s => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>

@@ -91,25 +91,52 @@ const Orders = () => {
 
   /* Track Order Modal Component */
   const TrackOrderModal = ({ item, onClose }) => {
-    const statuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Returned'];
-    const currentStatusIndex = statuses.indexOf(
-      item.status === 'Order Placed' ? 'Pending' :
-        item.status === 'Packing' ? 'Confirmed' :
-          item.status
-    );
+    let statuses = ['Order Placed', 'Packing', 'Shipped', 'Out for delivery', 'Delivered'];
+    let isCancelled = item.status === 'Cancelled';
+    let isReturned = ['Return Requested', 'Approved', 'Pickup Initiated', 'Return Received', 'Refunded', 'Returned'].includes(item.status);
+    
+    if (isCancelled) {
+      statuses = ['Order Placed', 'Cancelled'];
+    } else if (isReturned) {
+      statuses = ['Return Requested', 'Approved', 'Pickup Initiated', 'Return Received', 'Refunded'];
+    }
+
+    const getMappedStatus = (status) => {
+      if (isReturned) {
+        if (status === 'Returned') return 'Refunded'; // For old statuses mapping
+        return status;
+      }
+      if (status === 'Pending' || status === 'Processing') return 'Order Placed';
+      return status;
+    };
+
+    const mappedStatus = getMappedStatus(item.status);
+    const currentStatusIndex = statuses.indexOf(mappedStatus);
+
+    const formatDate = (timestamp) => {
+      return new Date(timestamp).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+
+    const orderTime = new Date(item.date).getTime();
+    const expectedStart = formatDate(orderTime + 3 * 24 * 60 * 60 * 1000);
+    const expectedEnd = formatDate(orderTime + 4 * 24 * 60 * 60 * 1000);
 
     return (
-      <div className='fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm' onClick={onClose}>
+      <div className='fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm' onClick={onClose}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className='bg-[#0B1221] w-full max-w-md rounded-3xl p-10 shadow-2xl relative text-white border border-gray-800'
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          className='bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl relative text-black border border-gray-100'
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className='text-xl font-bold mb-6'>Track Order</h2>
-          <div className='mb-8 space-y-1 text-sm text-gray-400'>
-            <p className='text-white font-medium'>{item.address.firstName} {item.address.lastName}</p>
+          <button onClick={onClose} className='absolute top-6 right-6 text-gray-400 hover:text-black transition-colors'>
+            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M6 18L18 6M6 6l12 12' /></svg>
+          </button>
+          
+          <h2 className='text-2xl font-black uppercase tracking-tighter mb-6'>Track Order</h2>
+          <div className='mb-8 space-y-1 text-sm text-gray-500 font-medium'>
+            <p className='text-black font-bold text-base'>{item.address.firstName} {item.address.lastName}</p>
             <p>{item.address.street},</p>
             <p>{item.address.city}, - {item.address.zipcode}</p>
             <p>Phone: {item.address.phone}</p>
@@ -117,22 +144,56 @@ const Orders = () => {
 
           <div className='flex flex-col gap-8 relative py-4'>
             {/* Vertical Line */}
-            <div className='absolute left-[7px] top-6 bottom-6 w-[2px] bg-gray-800'></div>
+            <div className='absolute left-[7px] top-6 bottom-6 w-[2px] bg-gray-200'>
+              <div 
+                className={`w-full transition-all duration-500 ${isCancelled ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'}`} 
+                style={{ height: `${statuses.length > 1 ? (currentStatusIndex / (statuses.length - 1)) * 100 : 0}%` }}
+              ></div>
+            </div>
 
-            {statuses.map((status, index) => (
-              <div key={status} className='flex items-center gap-6 relative z-10'>
-                <div className={`w-4 h-4 rounded-full border-2 transition-all duration-500 ${index <= currentStatusIndex ? 'bg-blue-500 border-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.6)]' : 'bg-[#0B1221] border-gray-700'}`}></div>
-                <p className={`text-sm font-medium tracking-wide ${index <= currentStatusIndex ? 'text-white' : 'text-gray-500'}`}>{status}</p>
-              </div>
-            ))}
+            {statuses.map((status, index) => {
+              const isActive = index <= currentStatusIndex;
+              const isError = status === 'Cancelled' || status === 'Returned';
+              
+              return (
+                <div key={status} className='flex gap-6 relative z-10'>
+                  <div className='mt-1 bg-white relative z-20'>
+                    <div className={`w-4 h-4 rounded-full border-2 transition-all duration-500 ${isActive ? (isError ? 'bg-red-500 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.4)]' : 'bg-green-500 border-green-500 shadow-[0_0_12px_rgba(34,197,94,0.4)]') : 'bg-white border-gray-300'}`}></div>
+                  </div>
+                  <div>
+                    <p className={`text-sm font-bold tracking-wide uppercase ${isActive ? (isError ? 'text-red-500' : 'text-green-600') : 'text-gray-400'}`}>{status}</p>
+                    {status === 'Order Placed' && <p className='text-xs text-gray-400 mt-1'>{formatDate(item.date)}</p>}
+                    {status === 'Delivered' && item.deliveredDate && isActive && <p className='text-xs text-gray-400 mt-1'>{formatDate(item.deliveredDate)}</p>}
+                    {status === 'Cancelled' && isActive && <p className='text-xs text-red-400 mt-1'>{formatDate(item.date)}</p>}
+                  </div>
+                </div>
+              )
+            })}
           </div>
 
-          <div className='mt-10 flex justify-end'>
+          <div className='mt-6 bg-gray-50 rounded-2xl p-4 border border-gray-100'>
+            {isReturned ? (
+              <div className='flex flex-col gap-1.5'>
+                <p className='text-xs text-orange-500 font-bold'>Return Status: <span className='text-orange-700'>{item.status}</span></p>
+                {['Return Requested', 'Approved', 'Pickup Initiated'].includes(item.status) && (
+                   <p className='text-[10px] text-gray-500 font-semibold'>Expected Pickup: <span className='text-black'>{formatDate(Date.now() + 24 * 60 * 60 * 1000)}</span> (Pickup within 1 day, please be ready)</p>
+                )}
+              </div>
+            ) : item.status === 'Delivered' ? (
+              <p className='text-xs text-gray-500 font-bold'>Delivered on: <span className='text-black'>{formatDate(item.deliveredDate || item.date)}</span></p>
+            ) : isCancelled ? (
+              <p className='text-xs text-red-500 font-bold'>Order Cancelled on: <span className='text-red-700'>{formatDate(item.date)}</span></p>
+            ) : (
+              <p className='text-xs text-gray-500 font-bold'>Expected Delivery: <span className='text-black'>{expectedStart} to {expectedEnd}</span></p>
+            )}
+          </div>
+
+          <div className='mt-8 flex justify-end'>
             <button
               onClick={onClose}
-              className='bg-[#1F2937] hover:bg-[#374151] text-white px-10 py-3 rounded-xl text-sm font-bold transition-all active:scale-95'
+              className='w-full bg-black hover:bg-zinc-800 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-[4px] transition-all active:scale-95 shadow-xl'
             >
-              Close
+              Close Track
             </button>
           </div>
         </motion.div>
@@ -162,7 +223,7 @@ const Orders = () => {
                 transition={{ delay: index * 0.05 }}
                 className='py-8 border border-gray-100 text-gray-700 flex flex-col lg:flex-row lg:items-center gap-8 bg-white rounded-3xl px-6 sm:px-8 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500'
               >
-                <div className='flex items-center gap-6 sm:gap-8 text-sm flex-1'>
+                <div className='flex items-center gap-6 sm:gap-8 text-sm w-full lg:w-2/5'>
                   <div className='relative shrink-0'>
                     <img className='w-20 sm:w-32 rounded-2xl shadow-sm cursor-pointer object-cover hover:scale-105 transition-transform duration-500' onClick={() => navigate(`/product/${item._id}`)} src={item.image[0]} alt="" />
                     <div className='absolute -bottom-2 -right-2 bg-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm border border-gray-50 text-[10px] font-bold'>
@@ -181,37 +242,38 @@ const Orders = () => {
                   </div>
                 </div>
 
-                <div className='flex flex-col sm:flex-row items-center justify-between sm:justify-end gap-6 lg:w-auto mt-4 sm:mt-0'>
-                  <div className='flex items-center gap-3 bg-gray-50/80 px-4 py-2 rounded-full border border-gray-100 w-fit'>
+                <div className='flex items-center justify-start sm:justify-center w-full lg:w-1/5 mt-4 lg:mt-0'>
+                  <div className='flex items-center justify-center gap-3 bg-gray-50/80 px-5 py-2.5 rounded-full border border-gray-100 w-fit'>
                     <p className={`w-1.5 h-1.5 rounded-full ${item.status === 'Delivered' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' :
                       item.status === 'Shipped' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]' :
                         item.status === 'Processing' || item.status === 'Packing' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.4)]' :
                           item.status === 'Cancelled' ? 'bg-red-500' : 
                             item.status === 'Return Requested' ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]' : 'bg-gray-400'
                       }`}></p>
-                    <p className='text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] text-gray-800'>{item.status}</p>
+                    <p className='text-[8px] sm:text-[10px] font-black uppercase tracking-[2px] text-gray-800 mt-[1px]'>{item.status}</p>
                   </div>
+                </div>
                   
-                  <div className='flex items-center gap-2 w-full sm:w-auto'>
-                    {
-                      item.status === 'Delivered' ? (
-                        <>
+                <div className='flex items-center justify-end gap-2 w-full lg:w-2/5 mt-4 lg:mt-0'>
+                  {
+                    item.status === 'Delivered' ? (
+                      <>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => { setSelectedProduct(item); setShowReviewModal(true); }}
+                          className='flex-1 sm:flex-none bg-black text-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all shadow-lg'
+                        >
+                          Review
+                        </motion.button>
+                        {(Date.now() - (item.deliveredDate || item.date) < 7 * 24 * 60 * 60 * 1000) && (
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={() => { setSelectedProduct(item); setShowReviewModal(true); }}
-                            className='flex-1 sm:flex-none bg-black text-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all shadow-lg'
+                            onClick={() => { setSelectedProduct(item); setShowReturnModal(true); }}
+                            className='flex-1 sm:flex-none border border-gray-200 bg-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
                           >
-                            Review
-                          </motion.button>
-                          {(Date.now() - (item.deliveredDate || item.date) < 7 * 24 * 60 * 60 * 1000) && (
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => { setSelectedProduct(item); setShowReturnModal(true); }}
-                              className='flex-1 sm:flex-none border border-gray-200 bg-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
-                            >
-                              Return
+                            Return
                             </motion.button>
                           )}
                         </>
@@ -227,21 +289,18 @@ const Orders = () => {
                               Cancel
                             </motion.button>
                           )}
-                          {item.status !== 'Cancelled' && (
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => { setSelectedProduct(item); setShowTrackModal(true); }}
-                              className='flex-1 sm:flex-none border border-gray-200 bg-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
-                            >
-                              Track
-                            </motion.button>
-                          )}
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => { setSelectedProduct(item); setShowTrackModal(true); }}
+                            className='flex-1 sm:flex-none border border-gray-200 bg-white px-6 py-3.5 text-[8px] sm:text-[9px] font-black uppercase tracking-[2px] rounded-xl transition-all'
+                          >
+                            Track
+                          </motion.button>
                         </div>
                       )
                     }
                   </div>
-                </div>
               </motion.div>
             ))
           }
