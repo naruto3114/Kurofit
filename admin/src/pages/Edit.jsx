@@ -8,7 +8,7 @@ import { assets } from '../assets/assets'
 
 const categoryMap = {
   topwear: ["tshirt", "hoodie", "shirt", "oversized", "vest"],
-  bottomwear: ["jeans", "jogger", "trackpant", "shorts"],
+  bottomwear: ["jeans", "jogger", "shorts"],
   winterwear: ["jacket", "sweatshirt"]
 }
 

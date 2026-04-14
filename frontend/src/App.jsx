@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
 import About from './pages/About'
@@ -20,13 +20,16 @@ import LoginPopup from './components/LoginPopup';
 import ResetPassword from './pages/ResetPassword';
 
 const App = () => {
+  const location = useLocation();
+  const hideHeaderFooter = location.pathname === '/login' || location.pathname.startsWith('/reset-password');
+
   return (
     <div className='w-full'>
-      <div className='px-4 sm:px-8 md:px-12 lg:px-16'>
+      <div className={hideHeaderFooter ? '' : 'px-4 sm:px-8 md:px-12 lg:px-16'}>
         <ToastContainer />
         <LoginPopup />
-        <Navbar />
-        <SearchBar />
+        {!hideHeaderFooter && <Navbar />}
+        {!hideHeaderFooter && <SearchBar />}
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/collection' element={<Collection />} />
@@ -42,7 +45,7 @@ const App = () => {
           <Route path='/reset-password/:token' element={<ResetPassword />} />
         </Routes>
       </div>
-      <Footer />
+      {!hideHeaderFooter && <Footer />}
     </div>
   )
 }
