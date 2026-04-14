@@ -75,7 +75,6 @@ const Navbar = () => {
                             <hr className='border-gray-300' />
                             <Link to='/collection?category=bottomwear&subcategory=jeans' className='cursor-pointer hover:text-black transition-all hover:pl-1'>Jeans</Link>
                             <Link to='/collection?category=bottomwear&subcategory=jogger' className='cursor-pointer hover:text-black transition-all hover:pl-1'>Joggers</Link>
-                            <Link to='/collection?category=bottomwear&subcategory=trackpant' className='cursor-pointer hover:text-black transition-all hover:pl-1'>Trackpants</Link>
                             <Link to='/collection?category=bottomwear&subcategory=shorts' className='cursor-pointer hover:text-black transition-all hover:pl-1'>Shorts</Link>
                         </motion.div>
                 </div>
@@ -233,7 +232,6 @@ const Navbar = () => {
                                 <MobileAccordion title="Bottomwear" link="/collection?category=bottomwear" setVisible={setVisible}>
                                     <Link to="/collection?category=bottomwear&subcategory=jeans">Jeans</Link>
                                     <Link to="/collection?category=bottomwear&subcategory=jogger">Joggers</Link>
-                                    <Link to="/collection?category=bottomwear&subcategory=trackpant">Trackpants</Link>
                                     <Link to="/collection?category=bottomwear&subcategory=shorts">Shorts</Link>
                                 </MobileAccordion>
 
